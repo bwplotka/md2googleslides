@@ -31,7 +31,7 @@ const SCOPES = ['https://www.googleapis.com/auth/presentations', 'https://www.go
 
 const USER_HOME = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 const STORED_CREDENTIALS_PATH = path.join(USER_HOME, '.md2googleslides', 'credentials.json');
-const STORED_CLIENT_ID_PATH = path.join(USER_HOME, '.md2googleslides', 'client_id.json');
+const STORED_CLIENT_ID_PATH = path.join(USER_HOME, '.md2googleslides', 'client_id.json'); // Required type: "computer application".
 
 var parser = new ArgumentParser({
     version: '1.0.0',
@@ -129,19 +129,23 @@ function authorizeUser() {
     // Load and parse client ID and secret from client_id.json file. (Create
     // OAuth client ID from Credentials tab at console.developers.google.com
     // and download the credentials as client_id.json to ~/.md2googleslides
-    var data; // needs to be scoped outside of try-catch
+    var creds;
+    if (!fs.existsSync(STORED_CLIENT_ID_PATH)) {
+        return console.log('Client ID + Secret does not exists in path:', STORED_CLIENT_ID_PATH);
+    }
+
+    var data;
     try {
         data = fs.readFileSync(STORED_CLIENT_ID_PATH);
-    } catch(err) {
+        creds = JSON.parse(data.toString());
+    } catch (err) {
         return console.log('Error loading client secret file:', err);
     }
-    if(data === undefined) return console.log('Error loading client secret data:', err);
-    const creds = JSON.parse(data).installed;
 
     // Authorize user and get (& store) a valid access token.
     const options = {
-        clientId: creds.client_id,
-        clientSecret: creds.client_secret,
+        clientId: creds.installed.client_id,
+        clientSecret: creds.installed.client_secret,
         filePath: STORED_CREDENTIALS_PATH,
         prompt: prompt,
     };
