@@ -390,6 +390,12 @@ With the exception of `/bin/md2gslides.js`, TypeScript is used throughout and co
 with [Babel](https://babeljs.io/). [Mocha](https://mochajs.org/) and [Chai](http://chaijs.com/)
 are used for testing.
 
+Before anything:
+
+```sh
+npm install
+```
+
 To compile:
 
 ```sh
